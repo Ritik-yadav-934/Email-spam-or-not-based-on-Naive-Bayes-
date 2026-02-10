@@ -1,10 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,render_template
 
 import re
 from joblib import load
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 
 # Load trained model and vectorizer 
 model = load("./models/Spam_nb_model.pkl")
@@ -20,18 +22,14 @@ def clean_text(text):
     return text.strip()
 
 # home routes
-@app.route("/",methods=["GET"])
+@app.route("/")
 def home():
-    return "Spam Detection API is running"
+    return render_template("index.html")
 
 # Production routes
 @app.route("/predict",methods=["POST"])
 def predict():
     data = request.get_json()
-
-    if not data or "text" not in data:
-        return jsonify({"error": "Please provide text"}), 400
-    
     text = data["text"]
     cleaned_text = clean_text(text)
 
